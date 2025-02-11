@@ -1,11 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+
+#define MAGIC_NUMBER 100
 
 int main() {
+    char input[MAGIC_NUMBER];
     int total_seconds;
 
     printf("Enter the number of seconds: ");
-    scanf("%d", &total_seconds);
+    if (fgets(input, MAGIC_NUMBER, stdin)) {
+        char *endptr;
+        total_seconds = strtol(input, &endptr, 10);
+ 
+        while (*endptr != '\0' && *endptr != '\n' && !isspace((unsigned char)*endptr)) {
+            printf("Bozhe");
+            if (!fgets(input, MAGIC_NUMBER, stdin)) {
+                return 1;
+            }
+            total_seconds = strtol(input, &endptr, 10);
+        }
+    } else {
+        printf("Pivo\n");
+        return 1;
+    }
 
     int is_negative = total_seconds < 0;
     total_seconds = abs(total_seconds);
@@ -24,5 +42,3 @@ int main() {
 
     return 0;
 }
-
-
