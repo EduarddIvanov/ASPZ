@@ -17,15 +17,18 @@ void recursive_function(int depth, int *array) {
 
 int main() {
     struct rlimit stack_limit;
-    
     getrlimit(RLIMIT_STACK, &stack_limit);
     printf("Поточне обмеження стека: %ld байт\n", stack_limit.rlim_cur);
+    size_t frame_size = sizeof(int) * 1024 + sizeof(int) + sizeof(void*) * 2;
+    printf("Приблизний розмір одного кадру: %ld байт\n", frame_size);
+    printf("Теоретична максимальна глибина рекурсії: %ld\n", 
+           stack_limit.rlim_cur / frame_size);
 
     for(int depth = 1000; depth <= 100000; depth *= 2) {
         int *test_array = malloc(sizeof(int) * 1024);
         
         printf("Спроба рекурсії з глибиною %d... ", depth);
-        
+
         recursive_function(depth, test_array);
         
         printf("Успішно!\n");
