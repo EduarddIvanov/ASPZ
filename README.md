@@ -7,10 +7,12 @@
 
 ## Структура проекту
 
-- `time_t_overflow.c`: Дослідження переповнення типу `time_t`
-- `segment_research.c`: Аналіз різних сегментів пам'яті
-- `stack_top.c`: Вивчення структури стека
-- `recursive_stack_size.c`: Визначення мінімального розміру стека для рекурсії
+- `time_t_overflow.c`: Дослідження переповнення типу `time_t` на 32-біт та 64-біт
+- `segment_research.c`: Аналіз розташування різних сегментів пам'яті (BSS,Data,Text,Heap)
+- `stack_top.c`: Вивчення структури стеку
+- `stack_analysis.c`: Програма для аналізу стеку викликів за допомогою GDB та gstack
+- `stack_ip_research.c`: Дослідження взаємодії стеку і лічильника команд (IP)
+- `recursive_stack_size.c`: Визначення максимально можливої глибини рекурсії залежно від розміру стеку
 
 ## Вимоги
 
@@ -19,57 +21,23 @@
 
 ## Компіляція та запуск
 
-### Компіляція базової версії
-
 ```bash
-gcc -o segment_research segment_research.c
-gcc -o time_t_overflow time_t_overflow.c
-gcc -o stack_top stack_top.c
-gcc -o recursive_stack_size recursive_stack_size.c
-```
-
-### Компіляція з різними режимами
-
-#### Налагодження
-```bash
-gcc -g -o segment_research_debug segment_research.c
-```
-
-#### Максимальна оптимізація
-```bash
-gcc -O3 -o segment_research_optimized segment_research.c
-```
-
-## Дослідження
-
-### 1. Розміри сегментів
-
-Команди:
-
-```bash
-size segment_research
-```
-
-### 2. Аналіз символів
-
-```bash
-nm segment_research
-objdump -h segment_research
+gcc -Wall -o time_t_overflow time_t_overflow.c
+gcc -Wall -o segment_research segment_research.c
+gcc -Wall -o stack_top stack_top.c
+gcc -Wall -o stack_analysis stack_analysis.c
+gcc -Wall -o stack_ip_research stack_ip_research.c
+gcc -Wall -o recursive_stack_size recursive_stack_size.c
 ```
 
 ## Очікувані результати
 
-- Сегмент BSS не займає місця у файлі
-- Ініційовані масиви розміщуються в сегменті даних
-- Локальні масиви розміщуються в стеку
-- Текстовий сегмент оптимізується компілятором
 
-## Інші команди
+- Сегмент BSS не займає місця у файлі, а лише містить інформацію про необхідний розмір
+- Ініціалізовані глобальні та статичні змінні розміщуються в сегменті даних
+- Неініціалізовані глобальні та статичні змінні розміщуються в сегменті BSS
+- Локальні змінні розміщуються в стеку
+- Локальні ініціалізовані масиви не впливають на розмір виконуваного файлу
+- Розмір стеку обмежує глибину рекурсії
+- Кожен виклик функції зберігає на стеку адресу повернення
 
-```bash
-# Перегляд інформації про виконуваний файл
-file segment_research
-
-# Перевірка залежностей
-ldd segment_research
-```
