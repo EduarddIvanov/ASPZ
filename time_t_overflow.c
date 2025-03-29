@@ -6,7 +6,6 @@
 void check_time_t_limits() {
     printf("Розмір time_t: %zu байт\n", sizeof(time_t));
 
-
     time_t max_time = INT_MAX;  
     
     #if defined(__LP64__) || defined(_LP64)
