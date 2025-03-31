@@ -11,11 +11,7 @@ void large_memory_allocation_test() {
     printf("\nЗавдання 6: Тестування malloc при високому навантаженні\n");
     
     size_t sizes[] = {
-        100 * MB,     // 100 МБ
-        500 * MB,     // 500 МБ
-        1 * GB,       // 1 ГБ
-        2 * GB,       // 2 ГБ
-        4 * GB        // 4 ГБ
+        100 * MB,500 * MB,1 * GB,2 * GB,4 * GB        
     };
     
     for (int i = 0; i < sizeof(sizes)/sizeof(sizes[0]); i++) {
@@ -49,7 +45,7 @@ void memory_stress_test() {
     void *ptrs[TEST_ITERATIONS];
     size_t sizes[TEST_ITERATIONS];
     for (int i = 0; i < TEST_ITERATIONS; i++) {
-        sizes[i] = (i + 1) * 10 * MB;  // Зростаючі розміри
+        sizes[i] = (i + 1) * 10 * MB;  
         ptrs[i] = malloc(sizes[i]);
         
         if (ptrs[i] == NULL) {
