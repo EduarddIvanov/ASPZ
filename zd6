@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+void test_file_access(const char *path) {
+    FILE *fp;
+    char command[512];
+    
+    printf("\nTesting access to %s:\n", path);
+    
+    printf("Read access: ");
+    fp = fopen(path, "r");
+    if (fp != NULL) {
+        printf("Allowed\n");
+        fclose(fp);
+    } else {
+        printf("Denied\n");
+    }
+    
+    printf("Write access: ");
+    fp = fopen(path, "a");
+    if (fp != NULL) {
+        printf("Allowed\n");
+        fclose(fp);
+    } else {
+        printf("Denied\n");
+    }
+    
+    printf("Execute access: ");
+    sprintf(command, "test -x %s && echo Allowed || echo Denied", path);
+    system(command);
+}
+
+int main() {
+    char command[512];
+    char *home_dir = getenv("HOME");
+    
+    printf("Listing files in home directory (%s):\n", home_dir);
+    sprintf(command, "ls -l %s | head -10", home_dir);
+    system(command);
+    
+    printf("\nListing files in /usr/bin:\n");
+    system("ls -l /usr/bin | head -10");
+    
+    printf("\nListing files in /etc:\n");
+    system("ls -l /etc | head -10");
+    
+    test_file_access("/etc/passwd");
+    test_file_access("/etc/shadow");
+    test_file_access("/usr/bin/ls");
+    
+    if (home_dir != NULL) {
+        char test_path[512];
+        sprintf(test_path, "%s/.bashrc", home_dir);
+        test_file_access(test_path);
+    }
+    
+    return 0;
+}
