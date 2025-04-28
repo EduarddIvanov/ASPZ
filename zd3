@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+int main() {
+    FILE *fp;
+    char command[1024];
+    char buffer[1024];
+    char *username = getenv("USER");
+    char filename[256];
+    
+    sprintf(filename, "/tmp/test_file_%s", username);
+    
+    printf("Creating file as regular user...\n");
+    fp = fopen(filename, "w");
+    if (fp == NULL) {
+        perror("Failed to create file");
+        return 1;
+    }
+    
+    fprintf(fp, "This is a test file created by %s\n", username);
+    fclose(fp);
+    
+    printf("File created: %s\n", filename);
+    
+    printf("Copying file as root...\n");
+    sprintf(command, "sudo cp %s /home/%s/root_copied_file", filename, username);
+    system(command);
+    
+    printf("Attempting to modify the root-copied file...\n");
+    fp = fopen("/home/%s/root_copied_file", "a");
+    if (fp == NULL) {
+        printf("Failed to open the file for writing - permission denied!\n");
+    } else {
+        fprintf(fp, "This is a modification by the user\n");
+        fclose(fp);
+        printf("Successfully modified the file\n");
+    }
+    
+    printf("Attempting to delete the root-copied file...\n");
+    sprintf(command, "rm /home/%s/root_copied_file", username);
+    if (system(command) == 0) {
+        printf("Successfully deleted the file\n");
+    } else {
+        printf("Failed to delete the file - permission denied!\n");
+    }
+    
+    return 0;
+}
