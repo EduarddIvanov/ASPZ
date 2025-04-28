@@ -1,0 +1,134 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+int compare(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
+
+double measure_sort_time(int *array, int size) {
+    clock_t start, end;
+    double cpu_time_used;
+    
+    start = clock();
+    qsort(array, size, sizeof(int), compare);
+    end = clock();
+    
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    return cpu_time_used;
+}
+
+void create_sorted_array(int *array, int size) {
+    for (int i = 0; i < size; i++) {
+        array[i] = i;
+    }
+}
+
+void create_reverse_sorted_array(int *array, int size) {
+    for (int i = 0; i < size; i++) {
+        array[i] = size - i - 1;
+    }
+}
+
+void create_mostly_sorted_array(int *array, int size) {
+    create_sorted_array(array, size);
+    
+    int swaps = size / 10;
+    for (int i = 0; i < swaps; i++) {
+        int idx1 = rand() % size;
+        int idx2 = rand() % size;
+        int temp = array[idx1];
+        array[idx1] = array[idx2];
+        array[idx2] = temp;
+    }
+}
+
+void create_random_array(int *array, int size) {
+    for (int i = 0; i < size; i++) {
+        array[i] = rand();
+    }
+}
+
+void create_equal_elements_array(int *array, int size) {
+    for (int i = 0; i < size; i++) {
+        array[i] = 42;
+    }
+}
+
+void create_sawtooth_array(int *array, int size) {
+    int period = 100;
+    for (int i = 0; i < size; i++) {
+        array[i] = i % period;
+    }
+}
+
+void test_qsort_correctness() {
+    printf("\nПеревірка коректності qsort:\n");
+    
+    int test_sizes[] = {0, 1, 2, 10, 100, 1000};
+    int num_tests = sizeof(test_sizes) / sizeof(test_sizes[0]);
+    
+    for (int t = 0; t < num_tests; t++) {
+        int size = test_sizes[t];
+        int *array = malloc(size * sizeof(int));
+        int *sorted = malloc(size * sizeof(int));
+        
+        create_random_array(array, size);
+        memcpy(sorted, array, size * sizeof(int));
+        
+        qsort(sorted, size, sizeof(int), compare);
+        
+        int is_sorted = 1;
+        for (int i = 1; i < size; i++) {
+            if (sorted[i] < sorted[i-1]) {
+                is_sorted = 0;
+                break;
+            }
+        }
+        
+        printf("Розмір %d: %s\n", size, is_sorted ? "УСПІХ" : "ПОМИЛКА");
+        
+        free(array);
+        free(sorted);
+    }
+}
+
+int main() {
+    srand(time(NULL));
+    
+    int sizes[] = {1000, 10000, 100000};
+    int num_sizes = sizeof(sizes) / sizeof(sizes[0]);
+    
+    for (int s = 0; s < num_sizes; s++) {
+        int size = sizes[s];
+        int *array = malloc(size * sizeof(int));
+        
+        printf("\nРозмір масиву: %d\n", size);
+        printf("-----------------------------\n");
+        
+        create_sorted_array(array, size);
+        printf("Відсортований масив: %.6f с\n", measure_sort_time(array, size));
+        
+        create_reverse_sorted_array(array, size);
+        printf("Зворотно відсортований: %.6f с\n", measure_sort_time(array, size));
+        
+        create_mostly_sorted_array(array, size);
+        printf("Майже відсортований: %.6f с\n", measure_sort_time(array, size));
+        
+        create_random_array(array, size);
+        printf("Випадковий масив: %.6f с\n", measure_sort_time(array, size));
+        
+        create_equal_elements_array(array, size);
+        printf("Однакові елементи: %.6f с\n", measure_sort_time(array, size));
+        
+        create_sawtooth_array(array, size);
+        printf("Пилкоподібний масив: %.6f с\n", measure_sort_time(array, size));
+        
+        free(array);
+    }
+    
+    test_qsort_correctness();
+    
+    return 0;
+}
