@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *rwho_pipe, *more_pipe;
+    char buffer[1024];
+    
+    rwho_pipe = popen("rwho", "r");
+    if (rwho_pipe == NULL) {
+        fprintf(stderr, "Помилка: не вдалося виконати команду rwho\n");
+        return 1;
+    }
+    
+    more_pipe = popen("more", "w");
+    if (more_pipe == NULL) {
+        fprintf(stderr, "Помилка: не вдалося виконати команду more\n");
+        pclose(rwho_pipe);
+        return 1;
+    }
+    
+    while (fgets(buffer, sizeof(buffer), rwho_pipe) != NULL) {
+        fputs(buffer, more_pipe);
+    }
+    
+    pclose(rwho_pipe);
+    pclose(more_pipe);
+    
+    return 0;
+}
